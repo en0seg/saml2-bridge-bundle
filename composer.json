@@ -26,12 +26,12 @@
     "php": ">=5.6,<8.0-dev",
     "ext-openssl": "*",
     "simplesamlphp/saml2": "^3.0",
-    "symfony/symfony": ">2.7.0,<5.0",
-    "symfony/workflow": ">3.3.0,<5.0"
+    "symfony/symfony-bundle": "^2.8|^3.3.0|^4.0|^4.1|^4.2|^4.3|^4.4",
+    "symfony/workflow": "^3.3.0|^4.0|^4.1|^4.2|^4.3|^4.4"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.7.17",
-    "symfony/phpunit-bridge": "^2.8.0|^3.0.0",
+    "symfony/phpunit-bridge": "^2.8.0|^3.0.0|^4.0|^4.1|^4.2|^4.3|^4.4",
     "liip/functional-test-bundle": "^1.7",
     "twig/twig": "^1.34|^2.0",
     "satooshi/php-coveralls": "^2.0.0"
