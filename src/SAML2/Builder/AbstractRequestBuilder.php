@@ -19,6 +19,9 @@
 namespace AdactiveSas\Saml2BridgeBundle\SAML2\Builder;
 
 
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use SAML2\Request;
+
 abstract class AbstractRequestBuilder
 {
     private $issueInstant;
@@ -29,7 +32,7 @@ abstract class AbstractRequestBuilder
     abstract protected function createRequestInstance();
 
     /**
-     * @return \SAML2_Request
+     * @return Request
      */
     abstract public function getRequest();
 
@@ -74,10 +77,10 @@ abstract class AbstractRequestBuilder
     }
 
     /**
-     * @param \XMLSecurityKey $key
+     * @param XMLSecurityKey $key
      * @return $this
      */
-    public function setSignatureKey(\XMLSecurityKey $key){
+    public function setSignatureKey(XMLSecurityKey $key){
         $this->getRequest()->setSignatureKey($key);
 
         return $this;

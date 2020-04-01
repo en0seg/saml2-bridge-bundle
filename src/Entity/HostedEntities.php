@@ -22,7 +22,7 @@ namespace AdactiveSas\Saml2BridgeBundle\Entity;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
-use SAML2_Configuration_PrivateKey as PrivateKey;
+use SAML2\Configuration\PrivateKey as PrivateKey;
 
 class HostedEntities
 {

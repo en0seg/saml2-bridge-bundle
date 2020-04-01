@@ -19,10 +19,12 @@
 namespace AdactiveSas\Saml2BridgeBundle\SAML2\Builder;
 
 
+use SAML2\Response;
+
 class AuthnResponseBuilder extends AbstractResponseBuilder
 {
     /**
-     * @var \SAML2_Response
+     * @var Response
      */
     protected $response;
 
@@ -49,7 +51,7 @@ class AuthnResponseBuilder extends AbstractResponseBuilder
     }
 
     /**
-     * @return \SAML2_Response
+     * @return Response
      */
     public function getResponse()
     {
@@ -140,6 +142,6 @@ class AuthnResponseBuilder extends AbstractResponseBuilder
      */
     protected function createResponseInstance()
     {
-        $this->response = new \SAML2_Response();
+        $this->response = new Response();
     }
 }

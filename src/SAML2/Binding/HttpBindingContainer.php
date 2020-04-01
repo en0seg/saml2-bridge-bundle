@@ -20,6 +20,7 @@ namespace AdactiveSas\Saml2BridgeBundle\SAML2\Binding;
 
 
 use AdactiveSas\Saml2BridgeBundle\SAML2\Binding\Exception\UnsupportedBindingException;
+use SAML2\Constants;
 use Symfony\Component\HttpFoundation\Request;
 
 class HttpBindingContainer
@@ -51,9 +52,9 @@ class HttpBindingContainer
      */
     public function get($binding){
         switch ($binding){
-            case \SAML2_Const::BINDING_HTTP_REDIRECT:
+            case Constants::BINDING_HTTP_REDIRECT:
                 return $this->redirectBinding;
-            case \SAML2_Const::BINDING_HTTP_POST:
+            case Constants::BINDING_HTTP_POST:
                 return $this->postBinding;
             default:
                 throw new UnsupportedBindingException("Unsupported binding: ". $binding);
@@ -77,9 +78,9 @@ class HttpBindingContainer
     {
         switch ($requestMethodName){
             case Request::METHOD_GET:
-                return \SAML2_Const::BINDING_HTTP_REDIRECT;
+                return Constants::BINDING_HTTP_REDIRECT;
             case Request::METHOD_POST:
-                return \SAML2_Const::BINDING_HTTP_POST;
+                return Constants::BINDING_HTTP_POST;
             default:
                 throw new UnsupportedBindingException(sprintf(
                     'Could not receive Message from HTTP Request: expected a GET or POST method, got %s',

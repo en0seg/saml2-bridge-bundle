@@ -19,6 +19,9 @@
 namespace AdactiveSas\Saml2BridgeBundle\SAML2\Builder;
 
 
+use SAML2\AuthnRequest;
+use SAML2\Request;
+
 class AuthnRequestBuilder extends AbstractRequestBuilder
 {
     private $request;
@@ -28,11 +31,11 @@ class AuthnRequestBuilder extends AbstractRequestBuilder
      */
     protected function createRequestInstance()
     {
-        $this->request = new \SAML2_AuthnRequest();
+        $this->request = new AuthnRequest();
     }
 
     /**
-     * @return \SAML2_Request
+     * @return Request
      */
     public function getRequest()
     {

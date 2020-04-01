@@ -20,6 +20,7 @@ namespace AdactiveSas\Saml2BridgeBundle\SAML2\Event;
 
 use AdactiveSas\Saml2BridgeBundle\Entity\HostedIdentityProvider;
 use AdactiveSas\Saml2BridgeBundle\SAML2\State\SamlStateHandler;
+use SAML2\AuthnRequest;
 use Symfony\Component\EventDispatcher\Event;
 
 class ReceiveAuthnRequestEvent extends Event
@@ -35,19 +36,19 @@ class ReceiveAuthnRequestEvent extends Event
     protected $samlStateHandler;
 
     /**
-     * @var \SAML2_AuthnRequest
+     * @var AuthnRequest
      */
     protected $authRequest;
 
     /**
      * AuthenticationEvent constructor.
      *
-     * @param \SAML2_AuthnRequest $authRequest
+     * @param AuthnRequest $authRequest
      * @param HostedIdentityProvider $hostedIdentityProvider
      * @param SamlStateHandler $samlStateHandler
      */
     public function __construct(
-        \SAML2_AuthnRequest $authRequest,
+        AuthnRequest $authRequest,
         HostedIdentityProvider $hostedIdentityProvider,
         SamlStateHandler $samlStateHandler
     ) {
@@ -73,7 +74,7 @@ class ReceiveAuthnRequestEvent extends Event
     }
 
     /**
-     * @return \SAML2_AuthnRequest
+     * @return AuthnRequest
      */
     public function getAuthRequest()
     {

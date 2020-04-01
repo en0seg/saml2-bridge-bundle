@@ -21,6 +21,13 @@ namespace AdactiveSas\Saml2BridgeBundle\SAML2\Binding;
 use AdactiveSas\Saml2BridgeBundle\Exception\BadRequestHttpException;
 use AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException;
 use AdactiveSas\Saml2BridgeBundle\Exception\LogicException;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use SAML2\AuthnRequest;
+use SAML2\DOMDocumentFactory;
+use SAML2\LogoutRequest;
+use SAML2\LogoutResponse;
+use SAML2\Message;
+use SAML2\Utils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -32,17 +39,17 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
      * Throws an exception if we are unable to validate the signature.
      *
      * @param ReceivedData $query g.
-     * @param \XMLSecurityKey $key The key we should validate the query against.
+     * @param XMLSecurityKey $key The key we should validate the query against.
      * @throws BadRequestHttpException
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\LogicException
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\RuntimeException
      */
-    public static function validateSignature(ReceivedData $query, \XMLSecurityKey $key)
+    public static function validateSignature(ReceivedData $query, XMLSecurityKey $key)
     {
         $algo = urldecode($query->getSignatureAlgorithm());
 
         if ($key->getAlgorithm() !== $algo) {
-            $key = \SAML2_Utils::castKey($key, $algo);
+            $key = Utils::castKey($key, $algo);
         }
 
         if (!$key->verifySignature($query->getSignedQueryString(), $query->getDecodedSignature())) {
@@ -53,12 +60,12 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
     }
 
     /**
-     * @param \SAML2_Request $request
+     * @param \SAML2\Request $request
      * @return Response
      * @throws \InvalidArgumentException
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\LogicException
      */
-    public function getSignedRequest(\SAML2_Request $request)
+    public function getSignedRequest(\SAML2\Request $request)
     {
         $destination = $request->getDestination();
         if($destination === null){
@@ -81,20 +88,20 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
      * @param string $destination
      * @param string $encodedRequest
      * @param string $relayState
-     * @param \XMLSecurityKey $signatureKey
+     * @param XMLSecurityKey $signatureKey
      * @return Response
      */
-    abstract protected function buildRequest($destination, $encodedRequest, $relayState, \XMLSecurityKey $signatureKey);
+    abstract protected function buildRequest($destination, $encodedRequest, $relayState, XMLSecurityKey $signatureKey);
 
     /**
      * @param Request $request
-     * @return \SAML2_AuthnRequest
+     * @return AuthnRequest
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException
      */
     public function receiveSignedAuthnRequest(Request $request){
         $message = $this->receiveSignedMessage($request);
 
-        if (!$message instanceof \SAML2_AuthnRequest) {
+        if (!$message instanceof AuthnRequest) {
             throw new InvalidArgumentException(sprintf(
                 'The received request is not an AuthnRequest, "%s" received instead',
                 substr(get_class($message), strrpos($message, '_') + 1)
@@ -106,13 +113,13 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
 
     /**
      * @param Request $request
-     * @return \SAML2_LogoutRequest
+     * @return LogoutRequest
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException
      */
     public function receiveSignedLogoutRequest(Request $request){
         $message = $this->receiveSignedMessage($request);
 
-        if (!$message instanceof \SAML2_LogoutRequest) {
+        if (!$message instanceof LogoutRequest) {
             throw new InvalidArgumentException(sprintf(
                 'The received request is not an LogoutRequest, "%s" received instead',
                 substr(get_class($message), strrpos($message, '_') + 1)
@@ -124,13 +131,13 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
 
     /**
      * @param Request $request
-     * @return \SAML2_LogoutResponse
+     * @return LogoutResponse
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException
      */
     public function receiveSignedLogoutResponse(Request $request){
         $message = $this->receiveSignedMessage($request);
 
-        if (!$message instanceof \SAML2_LogoutResponse) {
+        if (!$message instanceof LogoutResponse) {
             throw new InvalidArgumentException(sprintf(
                 'The received request is not an LogoutRequest, "%s" received instead',
                 substr(get_class($message), strrpos($message, '_') + 1)
@@ -142,13 +149,13 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
 
     /**
      * @param Request $request
-     * @return \SAML2_AuthnRequest
+     * @return AuthnRequest
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException
      */
     public function receiveUnsignedAuthnRequest(Request $request){
         $message = $this->receiveUnsignedMessage($request);
 
-        if (!$message instanceof \SAML2_AuthnRequest) {
+        if (!$message instanceof AuthnRequest) {
             throw new InvalidArgumentException(sprintf(
                 'The received request is not an AuthnRequest, "%s" received instead',
                 substr(get_class($message), strrpos($message, '_') + 1)
@@ -160,13 +167,13 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
 
     /**
      * @param Request $request
-     * @return \SAML2_LogoutRequest
+     * @return LogoutRequest
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException
      */
     public function receiveUnsignedLogoutRequest(Request $request){
         $message = $this->receiveUnsignedMessage($request);
 
-        if (!$message instanceof \SAML2_LogoutRequest) {
+        if (!$message instanceof LogoutRequest) {
             throw new InvalidArgumentException(sprintf(
                 'The received request is not an LogoutRequest, "%s" received instead',
                 substr(get_class($message), strrpos(get_class($message), '_') + 1)
@@ -178,13 +185,13 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
 
     /**
      * @param Request $request
-     * @return \SAML2_LogoutResponse
+     * @return LogoutResponse
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException
      */
     public function receiveUnsignedLogoutResponse(Request $request){
         $message = $this->receiveUnsignedMessage($request);
 
-        if (!$message instanceof \SAML2_LogoutResponse) {
+        if (!$message instanceof LogoutResponse) {
             throw new InvalidArgumentException(sprintf(
                 'The received request is not an LogoutRequest, "%s" received instead',
                 substr(get_class($message), strrpos(get_class($message), '_') + 1)
@@ -196,7 +203,7 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
 
     /**
      * @param Request $request
-     * @return \SAML2_Message
+     * @return Message
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\BadRequestHttpException
      */
     public function receiveSignedMessage(Request $request)
@@ -216,7 +223,7 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
 
     /**
      * @param Request $request
-     * @return \SAML2_Message
+     * @return Message
      */
     public function receiveUnsignedMessage(Request $request)
     {
@@ -235,7 +242,7 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
     /**
      * @param ReceivedData $query
      * @param Request $request
-     * @return \SAML2_Message
+     * @return Message
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\BadRequestHttpException
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException
      */
@@ -252,10 +259,10 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
 
         // additional security against XXE Processing vulnerability
         $previous = libxml_disable_entity_loader(true);
-        $document = \SAML2_DOMDocumentFactory::fromString($decodedSamlRequest);
+        $document = DOMDocumentFactory::fromString($decodedSamlRequest);
         libxml_disable_entity_loader($previous);
 
-        $message = \SAML2_Message::fromXML($document->firstChild);
+        $message = Message::fromXML($document->firstChild);
 
         if (null === $message->getRelayState()) {
             $message->setRelayState($query->getRelayState());

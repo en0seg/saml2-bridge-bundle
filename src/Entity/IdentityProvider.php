@@ -20,7 +20,7 @@
 
 namespace AdactiveSas\Saml2BridgeBundle\Entity;
 
-class IdentityProvider extends \SAML2_Configuration_IdentityProvider
+class IdentityProvider extends \SAML2\Configuration\IdentityProvider
 {
     /**
      * @return string

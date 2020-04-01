@@ -19,15 +19,17 @@
 namespace AdactiveSas\Saml2BridgeBundle\SAML2\Builder;
 
 
+use SAML2\LogoutResponse;
+
 class LogoutResponseBuilder extends AbstractResponseBuilder
 {
     /**
-     * @var \SAML2_LogoutResponse
+     * @var LogoutResponse
      */
     protected $response;
 
     /**
-     * @return \SAML2_LogoutResponse
+     * @return LogoutResponse
      */
     public function getResponse()
     {
@@ -44,6 +46,6 @@ class LogoutResponseBuilder extends AbstractResponseBuilder
      */
     protected function createResponseInstance()
     {
-        $this->response = new \SAML2_LogoutResponse();
+        $this->response = new LogoutResponse();
     }
 }

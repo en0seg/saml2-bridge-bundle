@@ -2,6 +2,8 @@
 
 namespace AdactiveSas\Saml2BridgeBundle\SAML2\State;
 
+use SAML2\Constants;
+use SAML2\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class SamlState
@@ -22,7 +24,7 @@ class SamlState
     const STATE_SLS_RESPONDING = "sls_responding";
 
     /**
-     * @var \SAML2_Request
+     * @var Request
      */
     protected $request;
 
@@ -54,7 +56,7 @@ class SamlState
     /**
      * @var null|string
      */
-    protected $authnContext = \SAML2_Const::AC_UNSPECIFIED;
+    protected $authnContext = Constants::AC_UNSPECIFIED;
 
     /**
      * SamlState constructor.
@@ -86,7 +88,7 @@ class SamlState
     }
 
     /**
-     * @return \SAML2_Request
+     * @return Request
      */
     public function getRequest()
     {
@@ -94,10 +96,10 @@ class SamlState
     }
 
     /**
-     * @param \SAML2_Request $request
+     * @param Request $request
      * @return $this
      */
-    public function setRequest(\SAML2_Request $request = null)
+    public function setRequest(Request $request = null)
     {
         $this->request = $request;
 

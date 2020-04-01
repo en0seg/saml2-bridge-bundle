@@ -19,7 +19,7 @@
 namespace AdactiveSas\Saml2BridgeBundle\Entity;
 
 
-use AdactiveSas\Saml2BridgeBundle\SAML2\SAML2_Const;
+use SAML2\Constants;
 
 class HostedIdentityProvider extends IdentityProvider
 {
@@ -43,7 +43,7 @@ class HostedIdentityProvider extends IdentityProvider
      * @return string
      */
     public function getAuthnContext(){
-        return $this->get('authnContext', SAML2_Const::AC_UNSPECIFIED);
+        return $this->get('authnContext', Constants::AC_UNSPECIFIED);
     }
 
     /**

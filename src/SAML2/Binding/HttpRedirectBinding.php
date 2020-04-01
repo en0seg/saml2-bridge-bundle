@@ -22,6 +22,8 @@ use AdactiveSas\Saml2BridgeBundle\Exception\BadRequestHttpException;
 use AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException;
 use AdactiveSas\Saml2BridgeBundle\Exception\LogicException;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Binding\Exception\UnsupportedBindingException;
+use RobRichards\XMLSecLibs\XMLSecurityKey;
+use SAML2\StatusResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,12 +31,12 @@ use Symfony\Component\HttpFoundation\Response;
 class HttpRedirectBinding extends AbstractHttpBinding implements HttpBindingInterface
 {
     /**
-     * @param \SAML2_StatusResponse $response
+     * @param StatusResponse $response
      * @return RedirectResponse
      * @throws \InvalidArgumentException
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\LogicException
      */
-    public function getSignedResponse(\SAML2_StatusResponse $response)
+    public function getSignedResponse(StatusResponse $response)
     {
         $destination = $response->getDestination();
         if($destination === null){
@@ -73,12 +75,12 @@ class HttpRedirectBinding extends AbstractHttpBinding implements HttpBindingInte
     }
 
     /**
-     * @param \SAML2_StatusResponse $response
+     * @param StatusResponse $response
      * @return RedirectResponse
      * @throws \InvalidArgumentException
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\LogicException
      */
-    public function getUnsignedResponse(\SAML2_StatusResponse $response)
+    public function getUnsignedResponse(StatusResponse $response)
     {
         $destination = $response->getDestination();
         if($destination === null){
@@ -105,7 +107,7 @@ class HttpRedirectBinding extends AbstractHttpBinding implements HttpBindingInte
         return new RedirectResponse($destination);
     }
 
-    protected function buildRequest($destination, $encodedRequest, $relayState, \XMLSecurityKey $signatureKey)
+    protected function buildRequest($destination, $encodedRequest, $relayState, XMLSecurityKey $signatureKey)
     {
         $msg = 'SAMLRequest=' . urlencode($encodedRequest);
 
@@ -129,11 +131,11 @@ class HttpRedirectBinding extends AbstractHttpBinding implements HttpBindingInte
     }
 
     /**
-     * @param \SAML2_Request $request
+     * @param \SAML2\Request $request
      * @return Response
      * @throws \AdactiveSas\Saml2BridgeBundle\SAML2\Binding\Exception\UnsupportedBindingException
      */
-    public function getUnsignedRequest(\SAML2_Request $request)
+    public function getUnsignedRequest(\SAML2\Request $request)
     {
         throw new UnsupportedBindingException("Unsupported binding: unsigned REDIRECT Request is not supported at the moment");
     }

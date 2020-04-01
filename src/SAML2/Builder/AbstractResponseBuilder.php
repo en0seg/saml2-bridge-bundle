@@ -19,6 +19,8 @@
 namespace AdactiveSas\Saml2BridgeBundle\SAML2\Builder;
 
 
+use SAML2\StatusResponse;
+
 abstract class AbstractResponseBuilder
 {
     /**
@@ -37,7 +39,7 @@ abstract class AbstractResponseBuilder
     abstract protected function createResponseInstance();
 
     /**
-     * @return \SAML2_StatusResponse
+     * @return StatusResponse
      */
     abstract public function getResponse();
 
@@ -114,7 +116,7 @@ abstract class AbstractResponseBuilder
      * @param \XMLSecurityKey|null $key
      * @return $this
      */
-    public function setSignatureKey(\XMLSecurityKey $key = null){
+    public function setSignatureKey($key = null){
         $this->signatureKey = $key;
 
         return $this;
