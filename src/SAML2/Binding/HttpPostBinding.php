@@ -64,7 +64,7 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
         $form = $this->getSignedResponseForm($response);
 
         return $this->templateEngine->renderResponse(
-            "AdactiveSasSaml2BridgeBundle:Binding:post.html.twig",
+            "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
             [
                 "form" => $form->createView()
             ]
@@ -82,7 +82,7 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
         $form = $this->getUnsignedResponseForm($response);
 
         return $this->templateEngine->renderResponse(
-            "AdactiveSasSaml2BridgeBundle:Binding:post.html.twig",
+            "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
             [
                 "form" => $form->createView(),
             ]
