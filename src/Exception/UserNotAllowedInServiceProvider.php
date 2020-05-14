@@ -16,7 +16,7 @@ class UserNotAllowedInServiceProvider extends SymfonyAccessDeniedException imple
      * @param \Throwable|null $previous
      * @param ServiceProvider|null $sp
      */
-    public function __construct(string $message = 'User not allowed to login in Service Provider.', \Throwable $previous = null, ServiceProvider $sp = null)
+    public function __construct(ServiceProvider $sp = null, string $message = 'User not allowed to login in Service Provider.', \Throwable $previous = null)
     {
         parent::__construct($message, $previous);
         $this->sp = $sp;
@@ -25,7 +25,8 @@ class UserNotAllowedInServiceProvider extends SymfonyAccessDeniedException imple
     /**
      * @return null|ServiceProvider|null
      */
-    public function getServiceProvider() {
+    public function getServiceProvider()
+    {
         return $this->sp;
     }
 
