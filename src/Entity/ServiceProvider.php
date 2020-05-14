@@ -163,4 +163,19 @@ class ServiceProvider extends \SAML2\Configuration\ServiceProvider
     {
         return $this->get('validAudiences');
     }
+
+    /**
+     * @return bool|callable
+     */
+    public function isUserAllowed() {
+        return $this->get('userAllowed', true);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription() {
+        return $this->get('description', $this->getEntityId());
+    }
+
 }
