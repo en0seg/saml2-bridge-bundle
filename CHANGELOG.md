@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## v0.12.0
+### Add
+  - Use bundle namespace in twig template
+  - Add certificate to metadata XML
+  
+## v0.11.0
+### Add
+  - Updated code to SimpleSAML 3.0 new namespace
+  
+## v0.10.2
+### Add
+  - Updated to SimpleSAML 3.0
+ 
+## v0.10.1
+### Add
+  - Symfony 4.4 support
+  
 ## v0.10.0
 ### Add
   - Symfony 4 support
