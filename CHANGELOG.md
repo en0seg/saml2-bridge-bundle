@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.13.0
+### Add
+  - `ServiceProvider#description` property to give a human readable name to the Service Provider
+  - `ServiceProvider#userAllowed` property or callable to check if a user can be logged in a Service Provider
+  
 ## v0.12.0
 ### Add
   - Use bundle namespace in twig template
