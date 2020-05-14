@@ -390,7 +390,10 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
             ? call_user_func($sp->isUserAllowed(), $user)
             : $sp->isUserAllowed();
         if (!$is_allowed) {
-            // 403 error with a custom exception to customized template if needed
+            // Need to apply some state changes
+            $this->stateHandler->apply(SamlStateHandler::TRANSITION_SSO_RESPOND);
+            $this->stateHandler->apply(SamlStateHandler::TRANSITION_SSO_RESUME);
+            // 403 error by default, but with custom exception which can be listen in an app to do anything wanted
             throw new UserNotAllowedInServiceProvider($sp);
         }
 
