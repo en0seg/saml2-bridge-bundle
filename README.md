@@ -157,6 +157,10 @@ class SamlServiceProviderRepository implements ServiceProviderRepository
                 "assertionNotBeforeInterval" => new \DateInterval('PT0S'),
                 "assertionNotOnOrAfterInterval" => new \DateInterval('PT5M'),
                 "assertionSessionNotOnOrAfterInterval" => new \DateInterval('P1D'),
+                "userAllowed" => function (UserInterface $user) {
+                    /** @var User $user */
+                    return $user->canLoginInTestFacke();
+                 },
             ]
         );
     }

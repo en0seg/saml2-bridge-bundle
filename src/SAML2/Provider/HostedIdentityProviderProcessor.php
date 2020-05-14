@@ -24,6 +24,7 @@ use AdactiveSas\Saml2BridgeBundle\Entity\ServiceProviderRepository;
 use AdactiveSas\Saml2BridgeBundle\Exception\InvalidArgumentException;
 use AdactiveSas\Saml2BridgeBundle\Exception\InvalidSamlRequestException;
 use AdactiveSas\Saml2BridgeBundle\Exception\RuntimeException;
+use AdactiveSas\Saml2BridgeBundle\Exception\UserNotAllowedInServiceProvider;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Binding\Exception\UnknownServiceProviderException;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Binding\HttpBindingContainer;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Builder\AssertionBuilder;
@@ -382,6 +383,17 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
         $authRequest = $this->stateHandler->get()->getRequest();
 
         $sp = $this->getServiceProvider($authRequest->getIssuer());
+
+        /** Check if the loggedin user is allowed in this SP */
+        $user = $this->stateHandler->getUser();
+        $is_allowed = is_callable($sp->isUserAllowed())
+            ? call_user_func($sp->isUserAllowed(), $user)
+            : $sp->isUserAllowed();
+        if (!$is_allowed) {
+            // 403 error with a custom exception to customized template if needed
+            throw new UserNotAllowedInServiceProvider($sp);
+        }
+
         $outBinding = $this->bindingContainer->get($sp->getAssertionConsumerBinding());
 
         if($this->stateHandler->get()->getState() === SamlState::STATE_SSO_AUTHENTICATING_FAILED){
