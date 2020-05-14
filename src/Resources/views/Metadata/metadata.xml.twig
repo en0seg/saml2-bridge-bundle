@@ -2,6 +2,13 @@
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" entityID="{{ metadata.entityId }}">
     {% if metadata.hasIdp %}
         <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+            <md:KeyDescriptor use="signing">
+                <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+                    <ds:X509Data>
+                        <ds:X509Certificate>{{ metadata.certificate }}</ds:X509Certificate>
+                    </ds:X509Data>
+                </ds:KeyInfo>
+            </md:KeyDescriptor>
             <md:SingleLogoutService Binding="{{ constant('\SAML2_Const::BINDING_HTTP_REDIRECT') }}" Location="{{ metadata.idp.slsUrl }}"/>
             <md:SingleLogoutService Binding="{{ constant('\SAML2_Const::BINDING_HTTP_POST') }}" Location="{{ metadata.idp.slsUrl }}"/>
             <md:SingleSignOnService Binding="{{ constant('\SAML2_Const::BINDING_HTTP_REDIRECT') }}" Location="{{ metadata.idp.ssoUrl }}"/>

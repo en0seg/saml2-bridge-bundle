@@ -22,6 +22,8 @@ namespace AdactiveSas\Saml2BridgeBundle\SAML2\Metadata;
 
 
 use AdactiveSas\Saml2BridgeBundle\Entity\HostedEntities;
+use SAML2\Certificate\KeyLoader;
+use SAML2\Utilities\Certificate;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -83,6 +85,10 @@ class MetadataFactory
             $idpMetadata->slsUrl = $idp->getSlsUrl();
 
             $metadata->idp = $idpMetadata;
+
+            $keys = KeyLoader::extractPublicKeys($idp);
+            preg_match(Certificate::CERTIFICATE_PATTERN, $keys[0]->getCertificate(), $matches);
+            $metadata->certificate = $matches[1];
         }
 
         return $metadata;
