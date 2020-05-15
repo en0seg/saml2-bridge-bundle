@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class LogoutEvent extends Event
 {
     /**
-     * @var UserInterface
+     * @var UserInterface|string
      */
     protected $user;
 
@@ -45,17 +45,17 @@ class LogoutEvent extends Event
 
     /**
      * AuthenticationEvent constructor.
-     * @param UserInterface $user
+     * @param UserInterface|string $user
      * @param Response $response
      */
-    public function __construct(UserInterface $user, Response $response)
+    public function __construct($user, Response $response)
     {
         $this->user = $user;
         $this->response = $response;
     }
 
     /**
-     * @return UserInterface
+     * @return UserInterface|string
      */
     public function getUser()
     {
