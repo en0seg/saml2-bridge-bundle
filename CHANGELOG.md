@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v0.14.0
+### Add
+  - New events:
+     - GetLogoutResponseEvent: Dispatched on Logout Response
+    - ReceiveLogoutResponseEvent: Dispatched on Logout Request
+    - LogoutTerminatedEvent: Dispatched after a Succcess Logout Event, but including service provider an state data.
+
+### Fix
+  - Fix logout errors when the user is not logged in, casued by type check
+
 ## v0.13.0
 ### Add
   - `ServiceProvider#description` property to give a human readable name to the Service Provider
