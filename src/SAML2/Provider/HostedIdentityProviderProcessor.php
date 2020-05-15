@@ -33,8 +33,11 @@ use AdactiveSas\Saml2BridgeBundle\SAML2\Builder\LogoutRequestBuilder;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Builder\LogoutResponseBuilder;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Event\AuthenticationSuccessEvent;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Event\GetAuthnResponseEvent;
+use AdactiveSas\Saml2BridgeBundle\SAML2\Event\GetLogoutResponseEvent;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Event\LogoutEvent;
+use AdactiveSas\Saml2BridgeBundle\SAML2\Event\LogoutTerminatedEvent;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Event\ReceiveAuthnRequestEvent;
+use AdactiveSas\Saml2BridgeBundle\SAML2\Event\ReceiveLogoutRequestEvent;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Event\Saml2Events;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Metadata\MetadataFactory;
 use AdactiveSas\Saml2BridgeBundle\SAML2\SAML2_Const;
@@ -449,6 +452,9 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
             }
             $this->validateMessage($logoutMessage);
 
+            $event = new ReceiveLogoutRequestEvent($logoutMessage, $this->identityProvider, $this->stateHandler);
+            $this->eventDispatcher->dispatch($event, Saml2Events::SLO_LOGOUT_RECEIVE_REQUEST);
+
             $this->logger->notice('Received LogoutRequest, started processing');
 
             $this->stateHandler->resume(true)->apply(SamlStateHandler::TRANSITION_SLS_START);
@@ -524,6 +530,7 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
 
         /** @var LogoutRequest $logoutRequest */
         $logoutRequest = $this->stateHandler->get()->getRequest();
+        $sp = null;
         if ($logoutRequest !== null) {
             $logoutResponse = $this->buildLogoutResponse($logoutRequest);
 
@@ -557,6 +564,9 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
         $this->stateHandler->resume();
 
         $this->logger->notice('Saml: Logout terminated');
+
+        $event = new LogoutTerminatedEvent($sp, $this->identityProvider, $this->stateHandler);
+        $this->eventDispatcher->dispatch($event, Saml2Events::SLO_LOGOUT_TERMINATED);
 
         return $response;
     }
@@ -703,14 +713,19 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
 
         $logoutResponseBuilder = new LogoutResponseBuilder();
 
-        return $logoutResponseBuilder
+        $logoutResponseBuilder
             ->setInResponseTo($logoutRequest->getId())
             ->setDestination($serviceProvider->getSingleLogoutUrl())
             ->setIssuer($this->identityProvider->getEntityId())
             ->setSignatureKey($this->getIdentityProviderXmlPrivateKey())
             ->setStatus(Constants::STATUS_SUCCESS)
-            ->setRelayState($logoutRequest->getRelayState())
-            ->getResponse();
+            ->setRelayState($logoutRequest->getRelayState());
+
+        $event = new GetLogoutResponseEvent($serviceProvider, $this->identityProvider, $this->stateHandler, $logoutResponseBuilder);
+
+        $this->eventDispatcher->dispatch($event, Saml2Events::SLO_LOGOUT_GET_RESPONSE);
+
+        return $event->getLogoutResponseBuilder()->getResponse();
     }
 
     /**

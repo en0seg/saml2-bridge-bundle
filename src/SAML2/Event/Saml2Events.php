@@ -25,4 +25,7 @@ class Saml2Events
     const SLO_LOGOUT_SUCCESS = "adactive_sas_saml2.slo_logout_success";
     const SSO_AUTHN_GET_RESPONSE = "adactive_sas_saml2.sso_authn_get_response";
     const SSO_AUTHN_RECEIVE_REQUEST = "adactive_sas_saml2.sso_authn_receive_request";
+    const SLO_LOGOUT_GET_RESPONSE = "adactive_sas_saml2.slo_logout_get_response";
+    const SLO_LOGOUT_RECEIVE_REQUEST = "adactive_sas_saml2.slo_logout_receive_request";
+    const SLO_LOGOUT_TERMINATED = "adactive_sas_saml2.slo_logout_terminated";
 }
