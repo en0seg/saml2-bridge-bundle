@@ -387,17 +387,19 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
 
         $sp = $this->getServiceProvider($authRequest->getIssuer());
 
-        /** Check if the loggedin user is allowed in this SP */
-        $user = $this->stateHandler->getUser();
-        $is_allowed = is_callable($sp->isUserAllowed())
-            ? call_user_func($sp->isUserAllowed(), $user)
-            : $sp->isUserAllowed();
-        if (!$is_allowed) {
-            // Need to apply some state changes
-            $this->stateHandler->apply(SamlStateHandler::TRANSITION_SSO_RESPOND);
-            $this->stateHandler->apply(SamlStateHandler::TRANSITION_SSO_RESUME);
-            // 403 error by default, but with custom exception which can be listen in an app to do anything wanted
-            throw new UserNotAllowedInServiceProvider($sp);
+        /** Check if the logged in user is allowed in this SP */
+        if($this->stateHandler->get()->getState() !== SamlState::STATE_SSO_AUTHENTICATING_FAILED) {
+            $user = $this->stateHandler->getUser();
+            $is_allowed = is_callable($sp->isUserAllowed())
+                ? call_user_func($sp->isUserAllowed(), $user)
+                : $sp->isUserAllowed();
+            if (!$is_allowed) {
+                // Need to apply some state changes
+                $this->stateHandler->apply(SamlStateHandler::TRANSITION_SSO_RESPOND);
+                $this->stateHandler->apply(SamlStateHandler::TRANSITION_SSO_RESUME);
+                // 403 error by default, but with custom exception which can be listen in an app to do anything wanted
+                throw new UserNotAllowedInServiceProvider($sp);
+            }
         }
 
         $outBinding = $this->bindingContainer->get($sp->getAssertionConsumerBinding());

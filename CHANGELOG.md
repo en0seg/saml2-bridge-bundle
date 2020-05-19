@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.14.1
+### Fix
+  - Fix problem with SP check when the login fails.
+
 ## v0.14.0
 ### Add
   - New events:
