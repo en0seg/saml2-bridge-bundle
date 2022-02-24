@@ -130,6 +130,23 @@ class HttpRedirectBinding extends AbstractHttpBinding implements HttpBindingInte
         return new RedirectResponse($destination);
     }
 
+    protected function buildUnsignedRequest($destination, $encodedRequest, $relayState)
+    {
+        $msg = 'SAMLRequest=' . urlencode($encodedRequest);
+
+        if ($relayState !== NULL) {
+            $msg .= '&RelayState=' . urlencode($relayState);
+        }
+
+        if (strpos($destination, '?') === FALSE) {
+            $destination .= '?' . $msg;
+        } else {
+            $destination .= '&' . $msg;
+        }
+
+        return new RedirectResponse($destination);
+    }
+
     /**
      * @param \SAML2\Request $request
      * @return Response
@@ -137,7 +154,19 @@ class HttpRedirectBinding extends AbstractHttpBinding implements HttpBindingInte
      */
     public function getUnsignedRequest(\SAML2\Request $request)
     {
-        throw new UnsupportedBindingException("Unsupported binding: unsigned REDIRECT Request is not supported at the moment");
+
+        // throw new UnsupportedBindingException("Yeah!!!! Unsupported binding: unsigned REDIRECT Request is not supported at the moment");
+
+        $destination = $request->getDestination();
+        if ($destination === null) {
+            throw new LogicException('Invalid destination');
+        }
+
+        $requestAsXml = $request->toUnsignedXML()->ownerDocument->saveXML();
+        $encodedRequest = base64_encode(gzdeflate($requestAsXml));
+        $relayState = $request->getRelayState();
+
+        return $this->buildUnsignedRequest($destination, $encodedRequest, $relayState, null);
     }
 
     /**
