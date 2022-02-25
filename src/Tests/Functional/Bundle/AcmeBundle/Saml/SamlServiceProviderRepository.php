@@ -32,6 +32,7 @@ class SamlServiceProviderRepository implements ServiceProviderRepository
 
                 "assertionConsumerUrl" => "https://test.fake/saml/acs",
                 "assertionConsumerBinding" => \SAML2_Const::BINDING_HTTP_REDIRECT,
+                "supportSingleLogout" => true,
                 "singleLogoutUrl" => "https://test.fake/saml/sls",
                 "singleLogoutBinding" => \SAML2_Const::BINDING_HTTP_REDIRECT,
                 "nameIdValue" => "moroine",
@@ -56,6 +57,7 @@ class SamlServiceProviderRepository implements ServiceProviderRepository
                 "wantSignedAuthnRequest" => false,
                 "wantSignedAuthnResponse" => false,
                 "wantSignedAssertions" => false,
+                "supportSingleLogout" => true,
                 "wantSignedLogoutResponse" => false,
                 "wantSignedLogoutRequest" => false,
                 "nameIdValue" => "moroine",

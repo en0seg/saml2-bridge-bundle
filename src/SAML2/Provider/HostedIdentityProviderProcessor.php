@@ -210,8 +210,12 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
         }
 
         if ($this->stateHandler->can(SamlStateHandler::TRANSITION_SLS_RESPOND, false)) {
-            $event->setResponse($this->continueSingleLogoutService());
-            return;
+
+            $state = $this->stateHandler->get();
+            $sp = $this->serviceProviderRepository->getServiceProvider($state->popServiceProviderIds());
+            if ($sp !== null && $sp->supportSingleLogout()) {
+                $event->setResponse($this->continueSingleLogoutService());
+            }
         }else{
             $state = $this->stateHandler->get();
             $this->logger->debug("Cannot TRANSITION_SLS_RESPOND", ['state' => $state === null ? null : $state->getState()]);

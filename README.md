@@ -131,6 +131,7 @@ class SamlServiceProviderRepository implements ServiceProviderRepository
                 "wantSignedAuthnRequest" => true,
                 "wantSignedAuthnResponse" => true,
                 "wantSignedAssertions" => false,
+                "supportSingleLogout" => true,
                 "wantSignedLogoutRequest" => false,
                 "wantSignedLogoutResponse" => false,
                 "attributes" => [
@@ -230,6 +231,7 @@ $this->spMap["https://slack.com"] = new ServiceProvider(
         "wantSignedAuthnRequest" => true,
         "wantSignedAuthnResponse" => true,
         "wantSignedAssertions" => false,
+        "supportSingleLogout" => true,
         "attributes" => [
             'User.Email' => function (UserInterface $user) {
                 /** @var User $user */
@@ -285,7 +287,8 @@ $this->spMap["https://$freshdeskAccountName.freshdesk.com"] = new ServiceProvide
         "assertionEncryptionEnabled" => false,
 
         "assertionConsumerUrl" => "https://$freshdeskAccountName.freshdesk.com/login/saml",
-        "assertionConsumerBinding" => \SAML2_Const::BINDING_HTTP_POST,
+        "assertionConsumerBinding" => \SAML2_Const::BINDING_HTTP_POST,             
+        "supportSingleLogout" => true,
         "singleLogoutUrl" => "https://$freshdeskAccountName.freshdesk.com/logout/saml",
         "singleLogoutBinding" => \SAML2_Const::BINDING_HTTP_REDIRECT,
         "nameIdFormat" => 'urn:oasis:names:tc:SAML:2.0:nameid-format:email',
@@ -352,7 +355,8 @@ $this->spMap["rpm.newrelic.com"] = new ServiceProvider(
         "assertionEncryptionEnabled" => false,
 
         "assertionConsumerUrl" => "https://rpm.newrelic.com/accounts/$accountId/sso/saml/finalize",
-        "assertionConsumerBinding" => \SAML2_Const::BINDING_HTTP_POST,
+        "assertionConsumerBinding" => \SAML2_Const::BINDING_HTTP_POST,             
+        "supportSingleLogout" => false,
         "singleLogoutUrl" => "",
         "singleLogoutBinding" => \SAML2_Const::BINDING_HTTP_REDIRECT,
         "nameIdFormat" => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',

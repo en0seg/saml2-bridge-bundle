@@ -111,6 +111,14 @@ class ServiceProvider extends \SAML2\Configuration\ServiceProvider
     /**
      * @return bool
      */
+    public function supportSingleLogout()
+    {
+        return $this->get('supportSingleLogout', true);
+    }
+
+    /**
+     * @return bool
+     */
     public function wantSignedLogoutResponse()
     {
         return $this->get('wantSignedLogoutResponse', true);
