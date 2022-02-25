@@ -90,16 +90,6 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
     }
 
     /**
-     * @param \SAML2\Request $request
-     * @return Response
-     * @throws \AdactiveSas\Saml2BridgeBundle\SAML2\Binding\Exception\UnsupportedBindingException
-     */
-    public function getUnsignedRequest(\SAML2\Request $request)
-    {
-        throw new UnsupportedBindingException("Unsupported binding: unsigned POST Request is not supported at the moment");
-    }
-
-    /**
      * @param Request $request
      * @return ReceivedData
      * @throws \AdactiveSas\Saml2BridgeBundle\SAML2\Binding\Exception\InvalidReceivedMessageQueryStringException
@@ -141,11 +131,11 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
 
     /**
      * @param StatusResponse $response
-     * @param $isSign
+     * @param bool $isSign
      * @return \Symfony\Component\Form\FormInterface
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      */
-    protected function getResponseForm(StatusResponse $response, $isSign)
+    protected function getResponseForm(StatusResponse $response, bool $isSign)
     {
         if ($response->getDestination() === null) {
             throw new LogicException('Invalid destination');
@@ -174,14 +164,97 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
     }
 
     /**
-     * @param string $destination
-     * @param string $encodedRequest
-     * @param string $relayState
-     * @param XMLSecurityKey $signatureKey
+     * @param \SAML2\Request $request
      * @return Response
+     * @throws \InvalidArgumentException
+     * @throws \AdactiveSas\Saml2BridgeBundle\Exception\LogicException
      */
-    protected function buildRequest($destination, $encodedRequest, $relayState, XMLSecurityKey $signatureKey)
+    public function getSignedRequest(\SAML2\Request $request)
     {
-        throw new UnsupportedBindingException("Unsupported binding: build POST Request is not supported at the moment");
+
+        //throw new UnsupportedBindingException("Unsupported binding: build POST Request is not supported at the moment");
+
+        $form = $this->getSignedRequestForm($request);
+
+        return $this->templateEngine->renderResponse(
+            "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
+            [
+                "form" => $form->createView(),
+            ]
+        );
     }
+
+    /**
+     * @param \SAML2\Request $request
+     * @return Response
+     * @throws \AdactiveSas\Saml2BridgeBundle\SAML2\Binding\Exception\UnsupportedBindingException
+     */
+    public function getUnsignedRequest(\SAML2\Request $request)
+    {
+        // throw new UnsupportedBindingException("Unsupported binding: unsigned POST Request is not supported at the moment");
+
+        $form = $this->getUnsignedRequestForm($request);
+
+        return $this->templateEngine->renderResponse(
+            "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
+            [
+                "form" => $form->createView(),
+            ]
+        );
+    }
+
+    /**
+     * @param \SAML2\Request $response
+     * @return \Symfony\Component\Form\FormInterface
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    protected function getSignedRequestForm(\SAML2\Request $response)
+    {
+        return $this->getRequestForm($response, true);
+    }
+
+    /**
+     * @param \SAML2\Request $request
+     * @return \Symfony\Component\Form\FormInterface
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    protected function getUnsignedRequestForm(\SAML2\Request $request)
+    {
+        return $this->getRequestForm($request, false);
+    }
+
+    /**
+     * @param \SAML2\Request $request
+     * @param bool $isSign
+     * @return \Symfony\Component\Form\FormInterface
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     */
+    protected function getRequestForm(\SAML2\Request $request, bool $isSign)
+    {
+        if ($request->getDestination() === null) {
+            throw new LogicException('Invalid destination');
+        }
+
+        $xmlDom = $isSign ? $request->toSignedXML() : $request->toUnsignedXML();
+
+        $data = [
+            'SAMLResponse' => base64_encode($xmlDom->ownerDocument->saveXML()),
+        ];
+
+        $hasRelayState = !empty($request->getRelayState());
+        if ($hasRelayState) {
+            $data["RelayState"] = $request->getRelayState();
+        }
+
+        return $this->formFactory->createNamed(
+            "",
+            SAML2ResponseForm::class,
+            $data,
+            [
+                "has_relay_state"=> $hasRelayState,
+                "destination" => $request->getDestination(),
+            ]
+        );
+    }
+
 }

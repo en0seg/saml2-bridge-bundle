@@ -65,33 +65,7 @@ abstract class AbstractHttpBinding implements HttpBindingInterface
      * @throws \InvalidArgumentException
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\LogicException
      */
-    public function getSignedRequest(\SAML2\Request $request)
-    {
-        $destination = $request->getDestination();
-        if($destination === null){
-            throw new LogicException('Invalid destination');
-        }
-
-        $securityKey = $request->getSignatureKey();
-        if($securityKey === null){
-            throw new LogicException('Signature key is required');
-        }
-
-        $requestAsXml = $request->toUnsignedXML()->ownerDocument->saveXML();
-        $encodedRequest = base64_encode(gzdeflate($requestAsXml));
-        $relayState = $request->getRelayState();
-
-        return $this->buildRequest($destination, $encodedRequest, $relayState, $request->getSignatureKey());
-    }
-
-    /**
-     * @param string $destination
-     * @param string $encodedRequest
-     * @param string $relayState
-     * @param XMLSecurityKey $signatureKey
-     * @return Response
-     */
-    abstract protected function buildRequest($destination, $encodedRequest, $relayState, XMLSecurityKey $signatureKey);
+    public abstract function getSignedRequest(\SAML2\Request $request);
 
     /**
      * @param Request $request

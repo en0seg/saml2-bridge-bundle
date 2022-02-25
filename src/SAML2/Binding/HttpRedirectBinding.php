@@ -75,6 +75,32 @@ class HttpRedirectBinding extends AbstractHttpBinding implements HttpBindingInte
     }
 
     /**
+     * @param \SAML2\Request $request
+     * @return Response
+     * @throws \InvalidArgumentException
+     * @throws \AdactiveSas\Saml2BridgeBundle\Exception\LogicException
+     */
+    public function getSignedRequest(\SAML2\Request $request)
+    {
+        $destination = $request->getDestination();
+        if($destination === null){
+            throw new LogicException('Invalid destination');
+        }
+
+        $securityKey = $request->getSignatureKey();
+        if($securityKey === null){
+            throw new LogicException('Signature key is required');
+        }
+
+        $requestAsXml = $request->toUnsignedXML()->ownerDocument->saveXML();
+        $encodedRequest = base64_encode(gzdeflate($requestAsXml));
+        $relayState = $request->getRelayState();
+
+        return $this->buildRequest($destination, $encodedRequest, $relayState, $request->getSignatureKey());
+    }
+
+
+    /**
      * @param StatusResponse $response
      * @return RedirectResponse
      * @throws \InvalidArgumentException
