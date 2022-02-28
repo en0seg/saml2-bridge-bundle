@@ -184,7 +184,7 @@ final class ReceivedData
     {
         $samlRequest = base64_decode($this->samlMessage, true);
 
-        if(substr($samlRequest, 0, 7) !== "<samlp:") {
+        if(substr($samlRequest, 0, 7) !== "<samlp:" && substr($samlRequest, 0, 5) !== "<?xml") {
             // Catch any errors gzinflate triggers
             $errorNo = $errorMessage = null;
             set_error_handler(function ($number, $message) use (&$errorNo, &$errorMessage) {
