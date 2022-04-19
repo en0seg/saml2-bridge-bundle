@@ -627,9 +627,12 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
         $user = $this->stateHandler->getUser();
         $nameIdValue =
             is_callable($serviceProvider->getNameIdValue())
-                ? call_user_func($serviceProvider->getNameIdValue(), $user)
-                : $serviceProvider->getNameIdValue();
+            ? call_user_func($serviceProvider->getNameIdValue(), $user)
+            : $serviceProvider->getNameIdValue();
 
+        $acsUrl = $authnRequest->getAssertionConsumerServiceURL()
+            ? $authnRequest->getAssertionConsumerServiceURL()
+            : $serviceProvider->getAssertionConsumerUrl();
 
         $assertionBuilder = new AssertionBuilder();
         $assertionBuilder
@@ -640,7 +643,7 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
             ->setNameId($nameIdValue, $serviceProvider->getNameIdFormat(), $serviceProvider->getNameQualifier(), $authnRequest->getIssuer())
             ->setConfirmationMethod(Constants::CM_BEARER)
             ->setInResponseTo($authnRequest->getId())
-            ->setRecipient($serviceProvider->getAssertionConsumerUrl())
+            ->setRecipient($acsUrl)
             ->setAuthnContext($state->getAuthnContext())
             ->setValidAudiences($serviceProvider->getValidAudiences());
         foreach ($serviceProvider->getAttributes() as $attributeName => $attributeCallback) {
@@ -652,15 +655,11 @@ class HostedIdentityProviderProcessor implements EventSubscriberInterface
         }
         $assertionBuilder->setAttributesNameFormat(Constants::NAMEFORMAT_UNSPECIFIED);
 
-        $destination = $authnRequest->getAssertionConsumerServiceURL()
-            ? $authnRequest->getAssertionConsumerServiceURL()
-            : $serviceProvider->getAssertionConsumerUrl();
-
         $authnResponseBuilder
             ->setStatus(Constants::STATUS_SUCCESS)
             ->setIssuer($this->identityProvider->getEntityId())
             ->setRelayState($authnRequest->getRelayState())
-            ->setDestination($destination)
+            ->setDestination($acsUrl)
             ->addAssertionBuilder($assertionBuilder)
             ->setInResponseTo($authnRequest->getId())
             ->setWantSignedAssertions($serviceProvider->wantSignedAssertions())
