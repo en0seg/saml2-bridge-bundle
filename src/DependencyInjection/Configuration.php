@@ -36,8 +36,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('adactive_sas_saml2_bridge');
+        $treeBuilder = new TreeBuilder('adactive_sas_saml2_bridge');
+        $rootNode = $treeBuilder->getRootNode();
 
         $this->addHostedSection($rootNode);
 
