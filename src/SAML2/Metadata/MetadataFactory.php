@@ -24,15 +24,16 @@ namespace AdactiveSas\Saml2BridgeBundle\SAML2\Metadata;
 use AdactiveSas\Saml2BridgeBundle\Entity\HostedEntities;
 use SAML2\Certificate\KeyLoader;
 use SAML2\Utilities\Certificate;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 class MetadataFactory
 {
     /**
      * @var \Symfony\Component\Templating\EngineInterface
      */
-    private $templateEngine;
+    private $twig;
 
     /**
      * @var HostedEntities
@@ -41,28 +42,35 @@ class MetadataFactory
 
     /**
      * MetadataFactory constructor.
-     * @param EngineInterface $templateEngine
+     * @param Environment $twig
      * @param HostedEntities $hostedEntities
      */
     public function __construct(
-        EngineInterface $templateEngine,
+        Environment $twig,
         HostedEntities $hostedEntities
     ) {
-        $this->templateEngine = $templateEngine;
+        $this->twig = $twig;
         $this->hostedEntities = $hostedEntities;
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return Response
      */
     public function getMetadataResponse()
     {
-        $response = $this->templateEngine->renderResponse(
-            "@AdactiveSasSaml2Bridge/Metadata/metadata.xml.twig",
-            [
-                "metadata" => $this->buildMetadata()
-            ]
-        );
+        $response = new Response();
+        try {
+            $response->setContent(
+                $this->twig->render(
+                    "@AdactiveSasSaml2Bridge/Metadata/metadata.xml.twig",
+                    [
+                        "metadata" => $this->buildMetadata()
+                    ]
+                )
+            );
+        } catch (\Exception $e) {
+            throw new \RuntimeException("Could not render metadata template: " . $e->getMessage(), 0, $e);
+        }
         
         $response->headers->set('Content-Type', 'xml');        
         
