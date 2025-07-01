@@ -19,14 +19,14 @@
         </service>
         <service id="adactive_sas_saml2_bridge.http.post_binding" class="AdactiveSas\Saml2BridgeBundle\SAML2\Binding\HttpPostBinding">
             <argument type="service" id="form.factory" />
-            <argument type="service" id="templating" />
+            <argument type="service" id="twig" />
         </service>
         <service id="adactive_sas_saml2_bridge.http.binding_container" class="AdactiveSas\Saml2BridgeBundle\SAML2\Binding\HttpBindingContainer">
             <argument type="service" id="adactive_sas_saml2_bridge.http.redirect_binding" />
             <argument type="service" id="adactive_sas_saml2_bridge.http.post_binding" />
         </service>
         <service id="adactive_sas_saml2_bridge.metadata.factory" class="AdactiveSas\Saml2BridgeBundle\SAML2\Metadata\MetadataFactory" public="true">
-            <argument type="service" id="templating" />
+            <argument type="service" id="twig" />
             <argument type="service" id="adactive_sas_saml2_bridge.configuration.hosted_entities" />
         </service>
         <service id="adactive_sas_saml2_bridge.configuration.hosted_entities" class="AdactiveSas\Saml2BridgeBundle\Entity\HostedEntities" public="false">

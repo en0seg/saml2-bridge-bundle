@@ -18,17 +18,19 @@
 
 namespace AdactiveSas\Saml2BridgeBundle\SAML2\Binding;
 
-
 use AdactiveSas\Saml2BridgeBundle\Exception\BadRequestHttpException;
 use AdactiveSas\Saml2BridgeBundle\Exception\LogicException;
 use AdactiveSas\Saml2BridgeBundle\Form\SAML2ResponseForm;
 use AdactiveSas\Saml2BridgeBundle\SAML2\Binding\Exception\UnsupportedBindingException;
 use RobRichards\XMLSecLibs\XMLSecurityKey;
 use SAML2\StatusResponse;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Twig\Environment;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
 
 class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterface
 {
@@ -38,19 +40,19 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
     protected $formFactory;
 
     /**
-     * @var EngineInterface
+     * @var Environment
      */
-    protected $templateEngine;
+    protected $twig;
 
     /**
      * HttpPostBinding constructor.
      * @param FormFactoryInterface $formFactory
-     * @param EngineInterface $templateEngine
+     * @param Environment $twig
      */
-    public function __construct(FormFactoryInterface $formFactory, EngineInterface $templateEngine)
+    public function __construct(FormFactoryInterface $formFactory, Environment $twig)
     {
         $this->formFactory = $formFactory;
-        $this->templateEngine = $templateEngine;
+        $this->twig = $twig;
     }
 
     /**
@@ -59,16 +61,29 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      * @throws \RuntimeException
      */
-    public function getSignedResponse(StatusResponse $response)
+    public function getSignedResponse(StatusResponse $response): Response
     {
         $form = $this->getSignedResponseForm($response);
 
-        return $this->templateEngine->renderResponse(
-            "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
-            [
-                "form" => $form->createView()
-            ]
-        );
+        $response = new Response();
+
+        try {
+            $response->setContent(
+                $this->twig->render(
+                    "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
+                    [
+                        "form" => $form->createView(),
+                    ]
+                )
+            );
+        } catch (LoaderError | RuntimeError | SyntaxError $e) {
+            throw new \RuntimeException(sprintf(
+                'Could not render the response form: %s',
+                $e->getMessage()
+            ), 0, $e);
+        }
+
+        return $response;
     }
 
     /**
@@ -81,12 +96,23 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
     {
         $form = $this->getUnsignedResponseForm($response);
 
-        return $this->templateEngine->renderResponse(
-            "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
-            [
-                "form" => $form->createView(),
-            ]
-        );
+        $response = new Response();
+
+        try {
+            $response->setContent(
+                $this->twig->render(
+                    "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
+                    [
+                    "form" => $form->createView(),
+                    ]
+                )
+            );
+        } catch (LoaderError | RuntimeError | SyntaxError $e) {
+            throw new \RuntimeException(sprintf(
+                'Could not render the response form: %s',
+                $e->getMessage()
+            ), 0, $e);
+        }
     }
 
     /**
@@ -157,7 +183,7 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
             SAML2ResponseForm::class,
             $data,
             [
-            "has_relay_state"=> $hasRelayState,
+            "has_relay_state" => $hasRelayState,
             "destination" => $response->getDestination(),
             ]
         );
@@ -169,19 +195,29 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
      * @throws \InvalidArgumentException
      * @throws \AdactiveSas\Saml2BridgeBundle\Exception\LogicException
      */
-    public function getSignedRequest(\SAML2\Request $request)
+    public function getSignedRequest(\SAML2\Request $request): Response
     {
 
         //throw new UnsupportedBindingException("Unsupported binding: build POST Request is not supported at the moment");
 
         $form = $this->getSignedRequestForm($request);
 
-        return $this->templateEngine->renderResponse(
-            "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
-            [
-                "form" => $form->createView(),
-            ]
-        );
+        $response = new Response();
+        try {
+            $response->setContent(
+                $this->twig->render(
+                    "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
+                    [
+                        "form" => $form->createView(),
+                    ]
+                )
+            );
+        } catch (LoaderError | RuntimeError | SyntaxError $e) {
+            throw new \RuntimeException(sprintf(
+                'Could not render the request form: %s',
+                $e->getMessage()
+            ), 0, $e);
+        }
     }
 
     /**
@@ -195,12 +231,22 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
 
         $form = $this->getUnsignedRequestForm($request);
 
-        return $this->templateEngine->renderResponse(
-            "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
-            [
-                "form" => $form->createView(),
-            ]
-        );
+        $response = new Response();
+        try {
+            $response->setContent(
+                $this->twig->render(
+                    "@AdactiveSasSaml2Bridge/Binding/post.html.twig",
+                    [
+                        "form" => $form->createView(),
+                    ]
+                )
+            );
+        } catch (LoaderError | RuntimeError | SyntaxError $e) {
+            throw new \RuntimeException(sprintf(
+                'Could not render the request form: %s',
+                $e->getMessage()
+            ), 0, $e);
+        }
     }
 
     /**
@@ -251,10 +297,9 @@ class HttpPostBinding extends AbstractHttpBinding implements HttpBindingInterfac
             SAML2ResponseForm::class,
             $data,
             [
-                "has_relay_state"=> $hasRelayState,
+                "has_relay_state" => $hasRelayState,
                 "destination" => $request->getDestination(),
             ]
         );
     }
-
 }
