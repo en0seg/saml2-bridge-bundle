@@ -34,10 +34,10 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('adactive_sas_saml2_bridge');
+        $treeBuilder = new TreeBuilder('adactive_sas_saml2_bridge');
+        $rootNode = $treeBuilder->getRootNode();
 
         $this->addHostedSection($rootNode);
 
@@ -47,7 +47,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @param ArrayNodeDefinition $node
      */
-    private function addHostedSection(ArrayNodeDefinition $node)
+    private function addHostedSection(ArrayNodeDefinition $node): void
     {
         $node
             ->children()
