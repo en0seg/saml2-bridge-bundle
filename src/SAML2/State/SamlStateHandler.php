@@ -6,14 +6,14 @@ namespace AdactiveSas\Saml2BridgeBundle\SAML2\State;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Workflow\DefinitionBuilder;
-use Symfony\Component\Workflow\MarkingStore\SingleStateMarkingStore;
+use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\Workflow;
 
@@ -94,9 +94,9 @@ class SamlStateHandler implements EventSubscriberInterface
     }
 
     /**
-     * @param GetResponseEvent $event
+     * @param RequestEvent $event
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         // Reload from session
         $state = $this->session->get(self::SESSION_NAME_ATTRIBUTE);
@@ -105,9 +105,9 @@ class SamlStateHandler implements EventSubscriberInterface
     }
 
     /**
-     * @param FilterResponseEvent $event
+     * @param ResponseEvent $event
      */
-    public function onKernelResponse(FilterResponseEvent $event){
+    public function onKernelResponse(ResponseEvent $event){
         // Save into session
         $this->session->set(self::SESSION_NAME_ATTRIBUTE, $this->state);
     }
@@ -295,7 +295,7 @@ class SamlStateHandler implements EventSubscriberInterface
 
         $definition = $builder->build();
 
-        $marking = new SingleStateMarkingStore('state');
+        $marking = new MethodMarkingStore(true,'state');
 
         return new Workflow($definition, $marking, null, "adactive_sas.saml");
     }
